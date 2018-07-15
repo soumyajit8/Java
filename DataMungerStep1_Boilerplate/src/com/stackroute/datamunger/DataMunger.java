@@ -1,5 +1,9 @@
 package com.stackroute.datamunger;
 
+import java.util.Arrays;
+import java.util.ArrayList;
+
+
 /*There are total 5 DataMungertest files:
  *
  * 1)DataMungerTestTask1.java file is for testing following 3 methods
@@ -25,6 +29,9 @@ package com.stackroute.datamunger;
  * Once you implement all the methods run DataMungerTest.java.This test case consist of all
  * the test cases together.
  */
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataMunger {
 
@@ -107,9 +114,10 @@ public class DataMunger {
      */
 
     public String getConditionsPartQuery(String queryString) {
-        String base = queryString.toLowerCase().split("where")[1].trim().split("[\\s ]+");
 
+        String base = queryString.toLowerCase().split("where")[1];
         return base.trim();
+
     }
 
     /*
@@ -129,10 +137,18 @@ public class DataMunger {
 
     public String[] getConditions(String queryString) {
 
-        String base = queryString.toLowerCase().split("where")[1];
+//          String base = queryString.toLowerCase().split("order by")[0].trim().split("group by")[0].trim().split("where")[1].trim();
+//          String[] base2 = base.split("\\s+and\\s+|\\s+or\\s+");
+//          return base2;
 
-        return base.trim();
+        if (queryString.contains("where")) {
 
+            String base = queryString.toLowerCase().split("order by")[0].trim().split("group by")[0].trim().split("where")[1].trim();
+            String[] base2 = base.split("\\s+and\\s+|\\s+or\\s+");
+            return base2;
+        } else {
+            return null;
+        }
     }
 
     /*
@@ -147,8 +163,34 @@ public class DataMunger {
      */
 
     public String[] getLogicalOperators(String queryString) {
+//
+//        String[] logic = queryString.split("order by")[0].trim().split("group by")[0].trim().split("where")[1].trim().split("\\s+");
+//
+//        return logic;
+        String[] lops;
 
-        return null;
+        List<String> ops = new ArrayList<>();
+
+        if (queryString.contains("where")) {
+
+            String[] logical = queryString.toLowerCase().split("order by")[0].trim().split("group by")[0].trim().split("where")[1].trim().split("\\s+");
+
+            for (String str2 : logical) {
+
+                if (str2.equals("and"))
+                    ops.add("and");
+
+
+                else if (str2.equals("or"))
+                    ops.add("or");
+
+            }
+
+            lops = new String[ops.size()];
+            lops = ops.toArray(lops);
+            return lops;
+        } else
+            return null;
     }
 
     /*
@@ -161,8 +203,15 @@ public class DataMunger {
 
     public String[] getOrderByFields(String queryString) {
 
+        if (queryString.contains("order by")) {
+
             String[] order = queryString.split("order by")[1].trim().split("[\\s,]+");
+
             return order;
+        } else {
+            return null;
+        }
+
     }
 
     /*
@@ -176,8 +225,14 @@ public class DataMunger {
 
     public String[] getGroupByFields(String queryString) {
 
+        if (queryString.contains("group by")) {
+
             String[] group = queryString.split("group by")[1].trim().split("[\\s,]+");
+
             return group;
+        } else {
+            return null;
+        }
     }
 
     /*
@@ -192,7 +247,18 @@ public class DataMunger {
 
     public String[] getAggregateFunctions(String queryString) {
 
-        return null;
+        if (queryString.contains("avg") || queryString.contains("max") || queryString.contains("min") || queryString.contains("sum") || queryString.contains("count")) {
+
+            String aggre = queryString.split("select")[1].trim().split("from")[0];
+//        String aggre2 = aggre.replaceAll("[\\[\\](){}]"," ");
+           String[] aggre3 = aggre.split(",");
+
+
+            return aggre3;
+
+        } else {
+            return null;
+        }
     }
 
 }
