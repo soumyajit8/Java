@@ -41,7 +41,9 @@ public class DataMunger {
      */
 
     public String[] getSplitStrings(String queryString) {
-//        String speech = "select * from ipl.csv ";
+
+        //        String speech = "select * from ipl.csv ";
+
         String[] result = queryString.toLowerCase().split("\\s");
         for (int x = 0; x < result.length; x++) {
             System.out.println(result[x]);
@@ -75,7 +77,7 @@ public class DataMunger {
 
     public String getBaseQuery(String queryString) {
 
-        String base = queryString.split("where")[0];
+        String base = queryString.split("where")[0].split("group by")[0].split("order by")[0];
 
         return base.trim();
     }
@@ -114,10 +116,12 @@ public class DataMunger {
      */
 
     public String getConditionsPartQuery(String queryString) {
-
-        String base = queryString.toLowerCase().split("where")[1];
-        return base.trim();
-
+        if(queryString.contains("where")){
+        String base = queryString.toLowerCase().split("where")[1].split("group by")[0].split("order by")[0];
+        return base.trim();}
+        else{
+            return null;
+        }
     }
 
     /*
@@ -163,10 +167,10 @@ public class DataMunger {
      */
 
     public String[] getLogicalOperators(String queryString) {
-//
+
 //        String[] logic = queryString.split("order by")[0].trim().split("group by")[0].trim().split("where")[1].trim().split("\\s+");
-//
 //        return logic;
+
         String[] lops;
 
         List<String> ops = new ArrayList<>();
@@ -179,7 +183,6 @@ public class DataMunger {
 
                 if (str2.equals("and"))
                     ops.add("and");
-
 
                 else if (str2.equals("or"))
                     ops.add("or");
@@ -205,7 +208,9 @@ public class DataMunger {
 
         if (queryString.contains("order by")) {
 
-            String[] order = queryString.split("order by")[1].trim().split("[\\s,]+");
+//            String[] order = queryString.split("where")[1].trim().split("order by");
+
+           String[] order = queryString.split("order by")[1].trim().split("[\\s,]+");
 
             return order;
         } else {
@@ -229,6 +234,7 @@ public class DataMunger {
 
             String[] group = queryString.split("group by")[1].trim().split("[\\s,]+");
 
+
             return group;
         } else {
             return null;
@@ -247,18 +253,79 @@ public class DataMunger {
 
     public String[] getAggregateFunctions(String queryString) {
 
-        if (queryString.contains("avg") || queryString.contains("max") || queryString.contains("min") || queryString.contains("sum") || queryString.contains("count")) {
 
-            String aggre = queryString.split("select")[1].trim().split("from")[0];
-//        String aggre2 = aggre.replaceAll("[\\[\\](){}]"," ");
-           String[] aggre3 = aggre.split(",");
+        String[] lops;
+
+        List<String> ops=new ArrayList<>();
+
+        if(queryString.contains("count") || queryString.contains("sum") || queryString.contains("min") || queryString.contains("max") || queryString.contains("avg"))
+        {
+
+            String[] aggre =queryString.split("select")[1].trim().split("from")[0].trim().split(",");
 
 
-            return aggre3;
+            for(String aggre2 : aggre)
+            {
+                System.out.println(aggre2);
+                boolean status =    ops.add(aggre2);
 
-        } else {
-            return null;
+
+            }
+            System.out.println(ops);
+
+            for(int i=0; i<ops.size(); i++) {
+
+                if( !(ops.get(i).contains("count") ||ops.get(i).contains("sum") || ops.get(i).contains("min") || ops.get(i).contains("max") || ops.get(i).contains("avg")))
+                {
+                    ops.remove(i);
+                }
+            }
+
+            System.out.println(ops);
+
+            lops=new String[ops.size()];
+            lops=ops.toArray(lops);
+
+            return lops;
         }
-    }
+        else
+            return null;
+
+//        if (queryString.contains("avg") || queryString.contains("max") || queryString.contains("min") || queryString.contains("sum") || queryString.contains("count")) {
+//
+//            String [] aggre = queryString.split("from")[0].split("\\s")[1].split(",");
+
+//            String[] lops;
+//
+//            List<String> ops = new ArrayList<>();
+//
+//            for (String str2 : aggre) {
+//                if(str2.contains("win_by_runs")){
+//                    ops.remove("win_by_runs");
+//                }
+//                if (str2.contains("(win_by_runs)"))
+//                    ops.add("(win_by_runs)");
+//
+//
+//            }
+//
+//            lops = new String[ops.size()];
+//            lops = ops.toArray(lops);
+
+
+//          String aggre = queryString.split("select")[1].trim().split("from")[0];
+
+//          String aggre2 = aggre.replaceAll("[\\(\\)]",",");
+
+//            String[] aggre3 = aggre2.split("\\s");
+
+//        return aggre;
+//
+//    } else
+//
+//    {
+//        return null;
+//    }
+}
 
 }
